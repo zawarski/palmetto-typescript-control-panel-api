@@ -1,0 +1,11 @@
+{
+  "watch": [
+    "."
+  ],
+  "ext": "ts",
+  "ignore": [
+    "src/test/**/*.ts",
+    ".esbuild/**",
+    ".serverless/**"
+  ]
+}

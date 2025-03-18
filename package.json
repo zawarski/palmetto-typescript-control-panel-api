@@ -1,0 +1,68 @@
+{
+  "name": "palmetto-typescript-control-panel-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -x 'npm run offline-dev'",
+    "deploy": "serverless deploy --stage prod",
+    "offline": "sls offline start --httpPort=8000 --stage prod",
+    "offline-dev": "serverless offline start --httpPort=8000 --stage dev",
+    "offline-prod": "node --max-old-space-size=4096 node_modules/serverless/bin/serverless offline start --stage prod",
+    "update": "npx -p npm-check-updates ncu -u",
+    "version": "serverless --version",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx ./",
+    "lint-fix": "eslint --fix --ext .js,.jsx,.ts,.tsx ./",
+    "prettier-clean": "npx prettier --write \"./**/*.{js,jsx,ts,tsx,json}\" && npx prettier --write \"*.{js,jsx,ts,tsx,json}\"",
+    "clean": "yarn prettier-clean && yarn lint --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zawarski/palmetto-typescript-control-panel-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@middy/core": "^6.0.0",
+    "@middy/http-content-encoding": "^6.0.0",
+    "@middy/http-cors": "^6.0.0",
+    "@middy/http-event-normalizer": "^6.0.0",
+    "@middy/http-json-body-parser": "^6.0.0",
+    "aws-param-store": "^3.2.0",
+    "aws-sdk": "^2.1692.0",
+    "moment-timezone": "^0.5.47",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20",
+    "typeorm-aurora-data-api-driver": "^2.4.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@serverless/typescript": "^3.38.0",
+    "@types/aws-lambda": "^8.10.147",
+    "@types/aws-param-store": "^3.2.4",
+    "@types/node": "^22.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^15.14.0",
+    "json-schema-to-ts": "^3.1.1",
+    "mysql2": "^3.12.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "serverless": "^3.0.0",
+    "serverless-dotenv-plugin": "^4.0.2",
+    "serverless-esbuild": "^1.23.3",
+    "serverless-offline": "^13.3.4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.22.0"
+  },
+  "bugs": {
+    "url": "https://github.com/zawarski/palmetto-typescript-control-panel-api/issues"
+  },
+  "homepage": "https://github.com/zawarski/palmetto-typescript-control-panel-api#readme"
+}

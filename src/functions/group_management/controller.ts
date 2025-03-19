@@ -1,4 +1,7 @@
 import { getPalmettoDBConnection } from '@db/index';
+import { GroupEntity } from '@entities/group.entity';
+import { Group2ActionEntity } from '@entities/group2action.entity';
+import { ServiceEntity } from '@entities/service.entity';
 import { GROUPS_COLUMNS as group_columns } from '@libs/columns';
 import {
   convertColsToFilterSQL,
@@ -35,7 +38,7 @@ export const getGroupAll = async (payload: any) => {
 
     limit = Number(limit || 3000);
     offset = Number(offset || 0);
-    let count = undefined;
+    let count: number | undefined = undefined;
     let sql: string;
     let sqlCount: string;
 
@@ -74,12 +77,73 @@ export const getGroupAll = async (payload: any) => {
     }
     sql += ` LIMIT ${limit} OFFSET ${offset}`;
 
-    const results = await db.query(sql);
+    const results: GroupEntity[] = await db.query(sql);
     return {
       count,
       dataset: results,
     };
   } catch (error) {
+    let message: string;
+    message = 'Internal Server Error';
+    if (error instanceof Error) message = error.message;
+    throw { message };
+  }
+};
+
+export const getGroupByID = async (groupID: number) => {
+  try {
+    const db = await getPalmettoDBConnection();
+
+    // First, get the group data
+    const groupEntityRepo = db.getRepository(GroupEntity);
+    const group = await groupEntityRepo.findOne({ where: { pvGroupID: groupID, pvVoid: 0 } });
+
+    if (!group) return Promise.reject(new Error('Group not found!'));
+
+    // Second, get the contacts for this group
+    const contacts = await db.query(
+      `SELECT *
+         FROM group_contact_view
+         WHERE (pvVoid = 0 OR pvVoid IS NULL)
+           AND pvGroupID = ?`,
+      [groupID],
+    );
+
+    // Third, get the subgroups for this group
+    const subgroups = await groupEntityRepo.find({ where: { pvParentGroupID: groupID, pvVoid: 0 } });
+
+    // Fourth, get the applications for this group
+    const g2ActionRepo = db.getRepository(Group2ActionEntity);
+    const applications = await g2ActionRepo
+      .createQueryBuilder('group2action')
+      .where('pvGroupID = :groupID', { groupID })
+      .andWhere('pvVoid = 0')
+      .getMany();
+
+    // Combine into the desired structure
+    return {
+      ...group,
+      contacts: contacts || [],
+      subgroups: subgroups || [],
+      applications: applications || [],
+    };
+  } catch (error) {
+    let message = 'Internal Server Error';
+    if (error instanceof Error) message = error.message;
+    throw { message };
+  }
+};
+
+export const getServices = async () => {
+  try {
+    const [serviceRepo] = await Promise.all([(await getPalmettoDBConnection()).getRepository(ServiceEntity)]);
+    const toRet = {
+      dataset: [],
+    };
+    toRet.dataset = await serviceRepo.find({ where: { pvVoid: 0 } });
+    return toRet;
+  } catch (error) {
+    console.log(error);
     let message: string;
     message = 'Internal Server Error';
     if (error instanceof Error) message = error.message;

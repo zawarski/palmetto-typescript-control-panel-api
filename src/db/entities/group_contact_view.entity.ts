@@ -1,8 +1,8 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('group_contact')
-export class GroupContactEntity extends BaseEntity {
-  @PrimaryGeneratedColumn('increment')
+@Entity('group_contact_view')
+export class GroupContactViewEntity extends BaseEntity {
+  @PrimaryColumn('int')
   pvDataID: number;
 
   @Column({ type: 'tinyint', default: 0 })
@@ -25,4 +25,13 @@ export class GroupContactEntity extends BaseEntity {
 
   @Column({ type: 'int', nullable: true })
   pvContactAccountID: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  pvEmail: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  pvFirstName: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  pvLastName: string;
 }

@@ -45,7 +45,7 @@ export const getServices = {
     {
       http: {
         method: 'get',
-        path: 'api/applications/services',
+        path: 'api/group_management/applications/services',
         cors: true,
         authorizer: {
           arn: 'arn:aws:cognito-idp:us-east-1:072516061299:userpool/us-east-1_3f1efBpoo',

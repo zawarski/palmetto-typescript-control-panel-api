@@ -9,7 +9,7 @@ export const palmettoConfig: DataSourceOptions = {
   resourceArn: '',
   database: 'palmetto',
   entities: palmettoEntities,
-  logging: ['query', 'error'],
+  // logging: ['query', 'error'],
 };
 
 export const paramsStoreOption = {

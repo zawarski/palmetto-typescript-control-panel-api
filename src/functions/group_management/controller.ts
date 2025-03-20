@@ -114,7 +114,7 @@ export const getGroupByID = async (groupID: number) => {
 
     // Fourth, get the applications for this group
     const g2ActionRepo = db.getRepository(Group2ActionEntity);
-    const applications = await g2ActionRepo
+    const appServices = await g2ActionRepo
       .createQueryBuilder('group2action')
       .where('pvGroupID = :groupID', { groupID })
       .andWhere('pvVoid = 0')
@@ -125,7 +125,7 @@ export const getGroupByID = async (groupID: number) => {
       ...group,
       contacts: contacts || [],
       subgroups: subgroups || [],
-      applications: applications || [],
+      appServices: appServices || [],
     };
   } catch (error) {
     let message = 'Internal Server Error';
@@ -137,11 +137,7 @@ export const getGroupByID = async (groupID: number) => {
 export const getServices = async () => {
   try {
     const [serviceRepo] = await Promise.all([(await getPalmettoDBConnection()).getRepository(ServiceEntity)]);
-    const toRet = {
-      dataset: [],
-    };
-    toRet.dataset = await serviceRepo.find({ where: { pvVoid: 0 } });
-    return toRet;
+    return await serviceRepo.find({ where: { pvVoid: 0 } });
   } catch (error) {
     console.log(error);
     let message: string;

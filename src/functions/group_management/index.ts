@@ -1,5 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
-import { GroupSchema } from './schema';
+import { GroupSchema, SubGroupSchema } from './schema';
 
 export const getGroupAll = {
   handler: `${handlerPath(__dirname)}/getGroupAll.main`,
@@ -46,11 +46,32 @@ export const postGroup = {
     {
       http: {
         method: 'post',
-        path: 'api/group_management',
+        path: 'api/group_management/group',
         cors: true,
         request: {
           schemas: {
             'application/json': GroupSchema,
+          },
+        },
+        authorizer: {
+          arn: 'arn:aws:cognito-idp:us-east-1:072516061299:userpool/us-east-1_3f1efBpoo',
+        },
+      },
+    },
+  ],
+};
+
+export const postSubGroups = {
+  handler: `${handlerPath(__dirname)}/postSubGroups.main`,
+  events: [
+    {
+      http: {
+        method: 'post',
+        path: 'api/group_management/subgroups',
+        cors: true,
+        request: {
+          schemas: {
+            'application/json': SubGroupSchema,
           },
         },
         authorizer: {

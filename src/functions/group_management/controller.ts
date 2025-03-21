@@ -9,7 +9,7 @@ import {
   convertColumnsToSelectString,
   findWordInBrackets,
 } from '@utils/filterSql';
-import { GroupSchema } from './schema';
+import { GroupSchema, SubGroupSchema } from './schema';
 
 const GROUP_VIEW_NAME = 'group_view';
 
@@ -157,6 +157,46 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       newRecord.pvDomainID = 0;
       return await groupRepo.save(newRecord);
     }
+  } catch (error) {
+    let message = 'Internal Server Error';
+    if (error instanceof Error) message = error.message;
+    throw { message };
+  }
+};
+
+export const postSubGroups = async (payload: FromSchema<typeof SubGroupSchema>) => {
+  try {
+    const db = await getPalmettoDBConnection();
+    const groupRepo = db.getRepository(GroupEntity);
+    const subgroups = payload.subgroups;
+
+    if (subgroups && subgroups.length) {
+      const newSubGroups: GroupEntity[] = [];
+      subgroups.forEach((subGroup) => {
+        if (subGroup.isNew) {
+          const newGroup = new GroupEntity();
+          newGroup.pvGroupName = subGroup.pvGroupName;
+          newGroup.pvGroupTitle = subGroup.pvGroupTitle;
+          newGroup.pvGroupComment = subGroup.pvGroupComment;
+          newGroup.pvIsAgency = subGroup.pvIsAgency;
+          newGroup.pvVoid = 0;
+          newGroup.pvDomainID = 0;
+          newGroup.pvParentGroupID = subGroup.pvParentGroupID;
+          newSubGroups.push(newGroup);
+        }
+      });
+      if (newSubGroups.length) await groupRepo.save(newSubGroups);
+      const toRemoveGroupIDs = subgroups.filter((group) => group.deleted).map((group) => group.pvGroupID);
+      if (toRemoveGroupIDs.length) {
+        await groupRepo
+          .createQueryBuilder()
+          .update(GroupEntity)
+          .set({ pvVoid: 1 })
+          .where('pvGroupID IN (:...toRemoveGroupIDs)', { toRemoveGroupIDs })
+          .execute();
+      }
+    }
+    return { message: 'Subgroups updated successfully' };
   } catch (error) {
     let message = 'Internal Server Error';
     if (error instanceof Error) message = error.message;

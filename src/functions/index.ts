@@ -1,7 +1,9 @@
 import { getGroupContactsByGroupId } from './contacts';
-import { getGroupAll, getGroupByID, getServices } from './group_management';
+import { getGroupAll, getGroupByID } from './group_management';
+import { getAppsWithPermissions, getServices } from './applications';
 
 const functions = {
+  getAppsWithPermissions,
   getGroupAll,
   getGroupByID,
   getGroupContactsByGroupId,

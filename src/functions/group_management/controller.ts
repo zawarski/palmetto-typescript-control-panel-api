@@ -1,7 +1,6 @@
 import { getPalmettoDBConnection } from '@db/index';
 import { GroupEntity } from '@entities/group.entity';
 import { Group2ActionEntity } from '@entities/group2action.entity';
-import { ServiceEntity } from '@entities/service.entity';
 import { GROUPS_COLUMNS as group_columns } from '@libs/columns';
 import {
   convertColsToFilterSQL,
@@ -129,19 +128,6 @@ export const getGroupByID = async (groupID: number) => {
     };
   } catch (error) {
     let message = 'Internal Server Error';
-    if (error instanceof Error) message = error.message;
-    throw { message };
-  }
-};
-
-export const getServices = async () => {
-  try {
-    const [serviceRepo] = await Promise.all([(await getPalmettoDBConnection()).getRepository(ServiceEntity)]);
-    return await serviceRepo.find({ where: { pvVoid: 0 } });
-  } catch (error) {
-    console.log(error);
-    let message: string;
-    message = 'Internal Server Error';
     if (error instanceof Error) message = error.message;
     throw { message };
   }

@@ -24,10 +24,8 @@ export const postContactsToGroup = async (payload: FromSchema<typeof ContactsSch
   try {
     const db = await getPalmettoDBConnection();
     const contactsRepo = db.getRepository(GroupContactEntity);
-    const newGroupContacts = payload.contacts.map((contact) => {
-      if (contact.isNew) return contact;
-    });
 
+    const newGroupContacts = payload.contacts.filter((contact) => contact.isNew);
     const today = new Date();
     if (newGroupContacts.length) {
       //   *: Add new contacts to the group
@@ -42,13 +40,16 @@ export const postContactsToGroup = async (payload: FromSchema<typeof ContactsSch
         newContact.pvVoid = 0;
         newContacts.push(newContact);
       });
-
-      await contactsRepo.save(newContacts);
+      if (newContacts.length) await contactsRepo.save(newContacts);
     }
 
     //   *: Remove contacts from the group
     if (payload.deleted && payload.deleted.length > 0) {
-      const toRemoveContactIDs = payload.deleted.map((id) => parseInt(id));
+      const toRemoveContactIDs = payload.deleted.map((id) => {
+        if (typeof id === 'string') {
+          return parseInt(id);
+        } else return id;
+      });
       await contactsRepo
         .createQueryBuilder()
         .update(GroupContactEntity)

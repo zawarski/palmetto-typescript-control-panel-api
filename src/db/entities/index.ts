@@ -4,6 +4,7 @@ import { Group2ActionEntity } from './group2action.entity';
 import { GroupContactEntity } from './group_contact.entity';
 import { GroupEntity } from './group.entity';
 import { ServiceEntity } from './service.entity';
+import { SettingEntity } from './setting.entity';
 
 const entities = {
   Account2GroupEntity,
@@ -12,6 +13,7 @@ const entities = {
   GroupContactEntity,
   GroupEntity,
   ServiceEntity,
+  SettingEntity,
 };
 
 export default entities;

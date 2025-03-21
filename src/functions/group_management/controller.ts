@@ -2,6 +2,7 @@ import { FromSchema } from 'json-schema-to-ts';
 import { getPalmettoDBConnection } from '@db/index';
 import { GroupEntity } from '@entities/group.entity';
 import { Group2ActionEntity } from '@entities/group2action.entity';
+import { SettingEntity } from '@entities/setting.entity';
 import { GROUPS_COLUMNS as group_columns } from '@libs/columns';
 import {
   convertColsToFilterSQL,
@@ -100,7 +101,12 @@ export const getGroupByID = async (groupID: number) => {
     const group = await groupEntityRepo.findOne({ where: { pvGroupID: groupID, pvVoid: 0 } });
 
     if (!group) return Promise.reject(new Error('Group not found!'));
+    const groupRecord = { ...group, basemapID: '' };
 
+    // Get BaseMap ID
+    const settingRepo = db.getRepository(SettingEntity);
+    const settingRecord = await settingRepo.findOne({ where: { pvSettingType: 'basemapID', pvGroupID: groupID } });
+    if (settingRecord) groupRecord.basemapID = settingRecord.pvSettingValue;
     // Second, get the contacts for this group
     const contacts = await db.query(
       `SELECT *
@@ -123,7 +129,7 @@ export const getGroupByID = async (groupID: number) => {
 
     // Combine into the desired structure
     return {
-      ...group,
+      ...groupRecord,
       contacts: contacts || [],
       subgroups: subgroups || [],
       appServices: appServices || [],
@@ -146,6 +152,20 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       groupInfo.pvGroupTitle = payload.pvGroupTitle;
       groupInfo.pvGroupComment = payload.pvGroupComment;
       groupInfo.pvIsAgency = payload.pvIsAgency;
+      if (payload.basemapID && payload.basemapID.length) {
+        const settingRepo = db.getRepository(SettingEntity);
+        const settingRecord = await settingRepo.findOne({
+          where: {
+            pvVoid: 0,
+            pvSettingType: 'basemapID',
+            pvGroupID: payload.pvGroupID,
+          },
+        });
+        if (settingRecord) {
+          settingRecord.pvSettingValue = payload.basemapID;
+          await settingRepo.save(settingRecord);
+        }
+      }
       return await groupRepo.save(groupInfo);
     } else {
       const newRecord = new GroupEntity();

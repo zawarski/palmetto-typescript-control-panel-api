@@ -6,6 +6,7 @@ export const GroupSchema = {
     pvGroupTitle: { type: 'string' },
     pvGroupComment: { type: 'string' },
     pvIsAgency: { type: 'number' },
+    basemapID: { type: 'string' },
   },
   required: ['pvGroupName', 'pvGroupTitle'],
 } as const;

@@ -1,3 +1,4 @@
+import { FromSchema } from 'json-schema-to-ts';
 import { getPalmettoDBConnection } from '@db/index';
 import { GroupEntity } from '@entities/group.entity';
 import { Group2ActionEntity } from '@entities/group2action.entity';
@@ -8,6 +9,7 @@ import {
   convertColumnsToSelectString,
   findWordInBrackets,
 } from '@utils/filterSql';
+import { GroupSchema } from './schema';
 
 const GROUP_VIEW_NAME = 'group_view';
 
@@ -126,6 +128,35 @@ export const getGroupByID = async (groupID: number) => {
       subgroups: subgroups || [],
       appServices: appServices || [],
     };
+  } catch (error) {
+    let message = 'Internal Server Error';
+    if (error instanceof Error) message = error.message;
+    throw { message };
+  }
+};
+
+export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
+  try {
+    const db = await getPalmettoDBConnection();
+    const groupRepo = db.getRepository(GroupEntity);
+    if (payload.pvGroupID) {
+      //  *: Find if Group exists
+      const groupInfo = await groupRepo.findOneOrFail({ where: { pvGroupID: Number(payload.pvGroupID) } });
+      groupInfo.pvGroupName = payload.pvGroupName;
+      groupInfo.pvGroupTitle = payload.pvGroupTitle;
+      groupInfo.pvGroupComment = payload.pvGroupComment;
+      groupInfo.pvIsAgency = payload.pvIsAgency;
+      return await groupRepo.save(groupInfo);
+    } else {
+      const newRecord = new GroupEntity();
+      newRecord.pvGroupName = payload.pvGroupName;
+      newRecord.pvGroupTitle = payload.pvGroupTitle;
+      newRecord.pvGroupComment = payload.pvGroupComment;
+      newRecord.pvIsAgency = payload.pvIsAgency;
+      newRecord.pvVoid = 0;
+      newRecord.pvDomainID = 0;
+      return await groupRepo.save(newRecord);
+    }
   } catch (error) {
     let message = 'Internal Server Error';
     if (error instanceof Error) message = error.message;

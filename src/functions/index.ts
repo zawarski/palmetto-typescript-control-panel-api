@@ -1,5 +1,5 @@
 import { getGroupContactsByGroupId } from './contacts';
-import { getGroupAll, getGroupByID } from './group_management';
+import { getGroupAll, getGroupByID, postGroup } from './group_management';
 import { getAppsWithPermissions, getServices } from './applications';
 
 const functions = {
@@ -8,6 +8,7 @@ const functions = {
   getGroupByID,
   getGroupContactsByGroupId,
   getServices,
+  postGroup,
 };
 
 export default functions;

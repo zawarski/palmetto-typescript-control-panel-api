@@ -191,8 +191,8 @@ export const postSubGroups = async (payload: FromSchema<typeof SubGroupSchema>) 
     const subgroups = payload.subgroups;
 
     if (subgroups && subgroups.length) {
-      const newSubGroups: GroupEntity[] = [];
-      subgroups.forEach((subGroup) => {
+      for (let i = 0; i < subgroups.length; i++) {
+        const subGroup = subgroups[i];
         if (subGroup.isNew) {
           const newGroup = new GroupEntity();
           newGroup.pvGroupName = subGroup.pvGroupName;
@@ -202,10 +202,9 @@ export const postSubGroups = async (payload: FromSchema<typeof SubGroupSchema>) 
           newGroup.pvVoid = 0;
           newGroup.pvDomainID = 0;
           newGroup.pvParentGroupID = subGroup.pvParentGroupID;
-          newSubGroups.push(newGroup);
+          await groupRepo.save(newGroup);
         }
-      });
-      if (newSubGroups.length) await groupRepo.save(newSubGroups);
+      }
       const toRemoveGroupIDs = subgroups.filter((group) => group.deleted).map((group) => group.pvGroupID);
       if (toRemoveGroupIDs.length) {
         await groupRepo

@@ -1,8 +1,9 @@
 import { getGroupContactsByGroupId, postContactsToGroup } from './contacts';
-import { getGroupAll, getGroupByID, postGroup, postSubGroups } from './group_management';
+import { deleteGroup, getGroupAll, getGroupByID, postGroup, postSubGroups } from './group_management';
 import { getAppsWithPermissions, getServices, postAppsByGroup } from './applications';
 
 const functions = {
+  deleteGroup,
   getAppsWithPermissions,
   getGroupAll,
   getGroupByID,

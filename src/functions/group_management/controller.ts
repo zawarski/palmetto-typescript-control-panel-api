@@ -222,3 +222,17 @@ export const postSubGroups = async (payload: FromSchema<typeof SubGroupSchema>) 
     throw { message };
   }
 };
+
+export const deleteGroup = async (groupID: number) => {
+  try {
+    const db = await getPalmettoDBConnection();
+    const groupRepo = db.getRepository(GroupEntity);
+    const group = await groupRepo.findOneOrFail({ where: { pvGroupID: groupID } });
+    group.pvVoid = 1;
+    return await groupRepo.save(group);
+  } catch (error) {
+    let message = 'Internal Server Error';
+    if (error instanceof Error) message = error.message;
+    throw { message };
+  }
+};

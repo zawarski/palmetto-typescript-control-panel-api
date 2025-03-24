@@ -1,6 +1,29 @@
 import { handlerPath } from '@libs/handler-resolver';
 import { GroupSchema, SubGroupSchema } from './schema';
 
+export const deleteGroup = {
+  handler: `${handlerPath(__dirname)}/deleteGroup.main`,
+  events: [
+    {
+      http: {
+        method: 'delete',
+        path: 'api/group_management/{groupID}',
+        cors: true,
+        request: {
+          parameters: {
+            paths: {
+              groupID: true,
+            },
+          },
+        },
+        authorizer: {
+          arn: 'arn:aws:cognito-idp:us-east-1:072516061299:userpool/us-east-1_3f1efBpoo',
+        },
+      },
+    },
+  ],
+};
+
 export const getGroupAll = {
   handler: `${handlerPath(__dirname)}/getGroupAll.main`,
   events: [

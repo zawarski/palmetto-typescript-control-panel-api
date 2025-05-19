@@ -23,8 +23,8 @@ const serverlessConfiguration: AWS = {
         statements: [
           {
             Effect: 'Allow',
-            Action: 'rds-data:*',
-            Resource: '${self:custom.auroraResourceArn.all}',
+            Action: ['rds-data:*', 'ssm:GetParameter', 'ssm:GetParameters'],
+            Resource: '*',
           },
           {
             Effect: 'Allow',

@@ -112,7 +112,7 @@ export const getGroupByID = async (groupID: number) => {
       `SELECT *
          FROM group_contact_view
          WHERE (pvVoid = 0 OR pvVoid IS NULL)
-           AND pvGroupID = ?`,
+           AND pvContactGroupID = ?`,
       [groupID],
     );
 

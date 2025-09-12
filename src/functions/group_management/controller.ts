@@ -110,9 +110,9 @@ export const getGroupByID = async (groupID: number) => {
     // Second, get the contacts for this group
     const contacts = await db.query(
       `SELECT *
-         FROM group_contact_view
-         WHERE (pvVoid = 0 OR pvVoid IS NULL)
-           AND pvContactGroupID = ?`,
+       FROM group_contact_view
+       WHERE (pvVoid = 0 OR pvVoid IS NULL)
+         AND pvContactGroupID = ?`,
       [groupID],
     );
 
@@ -145,6 +145,7 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
   try {
     const db = await getPalmettoDBConnection();
     const groupRepo = db.getRepository(GroupEntity);
+    const settingRepo = db.getRepository(SettingEntity);
     if (payload.pvGroupID) {
       //  *: Find if Group exists
       const groupInfo = await groupRepo.findOneOrFail({ where: { pvGroupID: Number(payload.pvGroupID) } });
@@ -152,19 +153,22 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       groupInfo.pvGroupTitle = payload.pvGroupTitle;
       groupInfo.pvGroupComment = payload.pvGroupComment;
       groupInfo.pvIsAgency = payload.pvIsAgency;
-      if (payload.basemapID && payload.basemapID.length) {
-        const settingRepo = db.getRepository(SettingEntity);
-        const settingRecord = await settingRepo.findOne({
-          where: {
-            pvVoid: 0,
-            pvSettingType: 'basemapID',
-            pvGroupID: payload.pvGroupID,
-          },
-        });
-        if (settingRecord) {
+      const settingRecord = await settingRepo.findOne({
+        where: {
+          pvVoid: 0,
+          pvSettingType: 'basemapID',
+          pvGroupID: payload.pvGroupID,
+        },
+      });
+      if (settingRecord) {
+        if (payload.basemapID && payload.basemapID.length) {
           settingRecord.pvSettingValue = payload.basemapID;
-          await settingRepo.save(settingRecord);
+        } else {
+          //  *: If basemapID is empty and settingRecord exists, replace with SCEMD DEFAULT
+          // More details https://redmine.designli.co/issues/19080
+          settingRecord.pvSettingValue = 'e8336b1697bd42ce840146e0b8930f61';
         }
+        await settingRepo.save(settingRecord);
       }
       return await groupRepo.save(groupInfo);
     } else {

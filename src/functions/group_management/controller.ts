@@ -110,9 +110,9 @@ export const getGroupByID = async (groupID: number) => {
     // Second, get the contacts for this group
     const contacts = await db.query(
       `SELECT *
-       FROM group_contact_view
-       WHERE (pvVoid = 0 OR pvVoid IS NULL)
-         AND pvContactGroupID = ?`,
+         FROM group_contact_view
+         WHERE (pvVoid = 0 OR pvVoid IS NULL)
+           AND pvContactGroupID = ?`,
       [groupID],
     );
 
@@ -153,6 +153,7 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       groupInfo.pvGroupTitle = payload.pvGroupTitle;
       groupInfo.pvGroupComment = payload.pvGroupComment;
       groupInfo.pvIsAgency = payload.pvIsAgency;
+      const scemdRecord = await settingRepo.findOne({ where: { pvVoid: 0, pvSettingType: 'basemapID', pvGroupID: 1 } });
       const settingRecord = await settingRepo.findOne({
         where: {
           pvVoid: 0,
@@ -166,7 +167,10 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
         } else {
           //  *: If basemapID is empty and settingRecord exists, replace with SCEMD DEFAULT
           // More details https://redmine.designli.co/issues/19080
-          settingRecord.pvSettingValue = 'e8336b1697bd42ce840146e0b8930f61';
+          settingRecord.pvSettingValue =
+            scemdRecord && scemdRecord.pvSettingValue.length > 1
+              ? scemdRecord.pvSettingValue
+              : 'e8336b1697bd42ce840146e0b8930f61';
         }
         await settingRepo.save(settingRecord);
       }

@@ -38,6 +38,11 @@ const serverlessConfiguration: AWS = {
           },
           {
             Effect: 'Allow',
+            Action: ['s3:PutObject'],
+            Resource: 'arn:aws:s3:::palmetto-wab/s3db/groups.json',
+          },
+          {
+            Effect: 'Allow',
             Action: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             Resource: 'arn:aws:logs:*:*:*',
           },

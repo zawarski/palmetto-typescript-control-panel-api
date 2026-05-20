@@ -11,6 +11,7 @@ import {
   findWordInBrackets,
 } from '@utils/filterSql';
 import { GroupSchema, SubGroupSchema } from './schema';
+import { generateGroupJSONFile } from './syncGroupJSON';
 
 const GROUP_VIEW_NAME = 'group_view';
 
@@ -174,7 +175,9 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
         }
         await settingRepo.save(settingRecord);
       }
-      return await groupRepo.save(groupInfo);
+      const updatedGroup = await groupRepo.save(groupInfo);
+      await generateGroupJSONFile(); // sync groups.json after DB write
+      return updatedGroup;
     } else {
       const newRecord = new GroupEntity();
       newRecord.pvGroupName = payload.pvGroupName;
@@ -183,7 +186,9 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       newRecord.pvIsAgency = payload.pvIsAgency;
       newRecord.pvVoid = 0;
       newRecord.pvDomainID = 0;
-      return await groupRepo.save(newRecord);
+      const createdGroup = await groupRepo.save(newRecord);
+      await generateGroupJSONFile(); // sync groups.json after DB write
+      return createdGroup;
     }
   } catch (error) {
     let message = 'Internal Server Error';
@@ -223,6 +228,7 @@ export const postSubGroups = async (payload: FromSchema<typeof SubGroupSchema>) 
           .execute();
       }
     }
+    await generateGroupJSONFile(); // sync groups.json after all subgroup writes complete
     return { message: 'Subgroups updated successfully' };
   } catch (error) {
     let message = 'Internal Server Error';
@@ -237,7 +243,9 @@ export const deleteGroup = async (groupID: number) => {
     const groupRepo = db.getRepository(GroupEntity);
     const group = await groupRepo.findOneOrFail({ where: { pvGroupID: groupID } });
     group.pvVoid = 1;
-    return await groupRepo.save(group);
+    const deletedGroup = await groupRepo.save(group);
+    await generateGroupJSONFile(); // sync groups.json after DB write
+    return deletedGroup;
   } catch (error) {
     let message = 'Internal Server Error';
     if (error instanceof Error) message = error.message;

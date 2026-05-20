@@ -77,3 +77,18 @@ out/
 
 .history
 dist
+.vscode/
+.specs/
+.claude/
+
+# >>> HyperForge managed – do not edit this block
+.claude/skills/hf-*/
+.claude/agents/hf-*
+.claude/bin/hf-*
+.claude/docs/hf-*
+.claude/rules/hf-*
+.claude/hooks/hf-*
+.claude/.hf-manifest.json
+.hf/
+.specs/timeline.jsonl
+# <<< HyperForge managed

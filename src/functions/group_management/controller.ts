@@ -15,6 +15,10 @@ import { generateGroupJSONFile } from './syncGroupJSON';
 
 const GROUP_VIEW_NAME = 'group_view';
 
+// SCEMD fallback basemap, used when neither the payload nor the group-1 SCEMD setting supplies one.
+// More details https://redmine.designli.co/issues/19080
+const SCEMD_DEFAULT_BASEMAP_ID = 'e8336b1697bd42ce840146e0b8930f61';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getGroupAll = async (payload: any) => {
   try {
@@ -147,6 +151,24 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
     const db = await getPalmettoDBConnection();
     const groupRepo = db.getRepository(GroupEntity);
     const settingRepo = db.getRepository(SettingEntity);
+
+    // The SCEMD default basemap lives under group 1 and backs any group without its own basemapID.
+    const scemdRecord = await settingRepo.findOne({ where: { pvVoid: 0, pvSettingType: 'basemapID', pvGroupID: 1 } });
+    const resolveBasemapValue = () =>
+      payload.basemapID && payload.basemapID.length
+        ? payload.basemapID
+        : scemdRecord && scemdRecord.pvSettingValue.length > 1
+          ? scemdRecord.pvSettingValue
+          : SCEMD_DEFAULT_BASEMAP_ID;
+    const buildBasemapSetting = (groupID: number) => {
+      const setting = new SettingEntity();
+      setting.pvSettingType = 'basemapID';
+      setting.pvGroupID = groupID;
+      setting.pvSettingValue = resolveBasemapValue();
+      setting.pvVoid = 0;
+      return setting;
+    };
+
     if (payload.pvGroupID) {
       //  *: Find if Group exists
       const groupInfo = await groupRepo.findOneOrFail({ where: { pvGroupID: Number(payload.pvGroupID) } });
@@ -154,7 +176,6 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       groupInfo.pvGroupTitle = payload.pvGroupTitle;
       groupInfo.pvGroupComment = payload.pvGroupComment;
       groupInfo.pvIsAgency = payload.pvIsAgency;
-      const scemdRecord = await settingRepo.findOne({ where: { pvVoid: 0, pvSettingType: 'basemapID', pvGroupID: 1 } });
       const settingRecord = await settingRepo.findOne({
         where: {
           pvVoid: 0,
@@ -163,17 +184,12 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
         },
       });
       if (settingRecord) {
-        if (payload.basemapID && payload.basemapID.length) {
-          settingRecord.pvSettingValue = payload.basemapID;
-        } else {
-          //  *: If basemapID is empty and settingRecord exists, replace with SCEMD DEFAULT
-          // More details https://redmine.designli.co/issues/19080
-          settingRecord.pvSettingValue =
-            scemdRecord && scemdRecord.pvSettingValue.length > 1
-              ? scemdRecord.pvSettingValue
-              : 'e8336b1697bd42ce840146e0b8930f61';
-        }
+        //  *: Existing row -- update it. An empty payload basemapID falls back to the SCEMD default (#19080).
+        settingRecord.pvSettingValue = resolveBasemapValue();
         await settingRepo.save(settingRecord);
+      } else {
+        //  *: No basemap row yet -- create one so a first-time basemapID is persisted instead of silently dropped.
+        await settingRepo.save(buildBasemapSetting(Number(payload.pvGroupID)));
       }
       const updatedGroup = await groupRepo.save(groupInfo);
       await generateGroupJSONFile(); // sync groups.json after DB write
@@ -187,6 +203,8 @@ export const postGroup = async (payload: FromSchema<typeof GroupSchema>) => {
       newRecord.pvVoid = 0;
       newRecord.pvDomainID = 0;
       const createdGroup = await groupRepo.save(newRecord);
+      //  *: Persist the basemap for the freshly created group (provided value, else SCEMD default).
+      await settingRepo.save(buildBasemapSetting(createdGroup.pvGroupID));
       await generateGroupJSONFile(); // sync groups.json after DB write
       return createdGroup;
     }

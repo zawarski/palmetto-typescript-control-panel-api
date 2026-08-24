@@ -13,7 +13,7 @@ export const getGroupContactsByGroupId = async (groupId: number) => {
                    AND a.pvVoid = 0
                    AND ag.pvGroupID = ?
                    AND NOT EXISTS
-                       (SELECT 1 FROM group_contact_view WHERE pvGroupID = ? AND pvAccountID = ag.pvAccountID AND pvVoid = 0)`;
+                       (SELECT 1 FROM group_contact_view WHERE pvGroupID = ? AND pvContactAccountID = ag.pvAccountID AND pvVoid = 0)`;
     return await db.query(sql, [groupId, groupId]);
   } catch (error) {
     let message = 'Internal Server Error';

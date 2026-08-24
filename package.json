@@ -15,7 +15,8 @@
     "lint-fix": "eslint --fix --ext .js,.jsx,.ts,.tsx ./",
     "prettier-clean": "npx prettier --write \"./**/*.{js,jsx,ts,tsx,json}\" && npx prettier --write \"*.{js,jsx,ts,tsx,json}\"",
     "clean": "yarn prettier-clean && yarn lint --fix",
-    "test": "jest"
+    "test": "jest",
+    "audit:group-contact-drift": "ts-node src/scripts/audit-group-contact-drift.ts"
   },
   "repository": {
     "type": "git",

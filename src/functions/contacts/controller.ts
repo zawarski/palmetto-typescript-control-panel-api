@@ -6,12 +6,14 @@ import { GroupContactEntity } from '@entities/group_contact.entity';
 export const getGroupContactsByGroupId = async (groupId: number) => {
   try {
     const db = await getPalmettoDBConnection();
-    const sql = `SELECT *
-                 FROM account2group_view
-                 WHERE (pvVoid = 0 OR pvVoid IS NULL)
-                   AND pvGroupID = ?
-                   AND pvAccountID NOT IN
-                       (SELECT pvAccountID FROM group_contact_view WHERE pvGroupID = ? AND pvVoid = 0)`;
+    const sql = `SELECT ag.*
+                 FROM account2group_view ag
+                 JOIN account a ON a.id = ag.pvAccountID
+                 WHERE (ag.pvVoid = 0 OR ag.pvVoid IS NULL)
+                   AND a.pvVoid = 0
+                   AND ag.pvGroupID = ?
+                   AND NOT EXISTS
+                       (SELECT 1 FROM group_contact_view WHERE pvGroupID = ? AND pvContactAccountID = ag.pvAccountID AND pvVoid = 0)`;
     return await db.query(sql, [groupId, groupId]);
   } catch (error) {
     let message = 'Internal Server Error';

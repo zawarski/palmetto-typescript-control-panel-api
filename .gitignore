@@ -84,6 +84,7 @@ dist
 # >>> HyperForge managed – do not edit this block
 .claude/skills/hf-*/
 .claude/agents/hf-*
+.claude/agents/_*
 .claude/bin/hf-*
 .claude/docs/hf-*
 .claude/rules/hf-*
@@ -91,4 +92,13 @@ dist
 .claude/.hf-manifest.json
 .hf/
 .specs/timeline.jsonl
+.specs/.learnings-*.lock
+.specs/.learnings-evictions.jsonl
+.specs/learnings-promotion-queue.jsonl
+.specs/learnings*.jsonl.tmp
+.specs/.orchestration-*.lock
+.specs/orchestration-*.json.tmp.*
+.specs/orchestration-*.json.commit.*
+.specs/**/acceptance-verdict.json
+.specs/**/acceptance-freepass.json
 # <<< HyperForge managed

@@ -3,6 +3,9 @@
   "compilerOptions": {
     "lib": ["ESNext"],
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "strict": false,
+    "types": ["node", "jest"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,

@@ -15,7 +15,7 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     profile: 'default',
     region: 'us-east-1',
-    runtime: 'nodejs20.x',
+    runtime: 'nodejs24.x',
     stage: 'prod',
     timeout: 300,
     apiGateway: {
@@ -74,7 +74,7 @@ const serverlessConfiguration: AWS = {
       minify: false,
       sourcemap: true,
       exclude: [],
-      target: 'node20',
+      target: 'node24',
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,

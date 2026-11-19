@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@functions/*": ["src/functions/*"],
-      "@libs/*": ["src/libs/*"],
-      "@entities/*": ["src/db/entities/*"],
-      "@db/*": ["src/db/*"],
-      "@interfaces/*": ["src/interfaces/*"],
-      "@templates/*": ["src/templates/*"],
-      "@utils/*": ["src/utils/*"]
+      "@functions/*": ["./src/functions/*"],
+      "@libs/*": ["./src/libs/*"],
+      "@entities/*": ["./src/db/entities/*"],
+      "@db/*": ["./src/db/*"],
+      "@interfaces/*": ["./src/interfaces/*"],
+      "@templates/*": ["./src/templates/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   }
 }

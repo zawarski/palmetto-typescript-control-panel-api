@@ -65,7 +65,6 @@ typings/
 
 # extra files
 
-package-lock.json
 .serverless
 .esbuild
 .webpack

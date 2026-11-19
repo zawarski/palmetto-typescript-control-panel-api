@@ -4,7 +4,12 @@ import functions from '@functions/index';
 const serverlessConfiguration: AWS = {
   service: 'palmetto-control-panel-api',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-dotenv-plugin'],
+  plugins: [
+    'serverless-esbuild',
+    './scripts/serverless-esbuild-tmp-cleanup.mjs',
+    'serverless-offline',
+    'serverless-dotenv-plugin',
+  ],
   useDotenv: true,
   provider: {
     name: 'aws',

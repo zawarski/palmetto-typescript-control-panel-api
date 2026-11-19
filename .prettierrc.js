@@ -1,5 +1,3 @@
-/* eslint-env node */
-// eslint-disable-next-line no-undef
 module.exports = {
   tabWidth: 2,
   printWidth: 120,

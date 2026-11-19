@@ -2,7 +2,10 @@
   "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "lib": ["ESNext"],
-    "moduleResolution": "node",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "strict": false,
+    "types": ["node", "jest"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
@@ -16,6 +19,10 @@
   "include": ["src/**/*.ts", "serverless.ts"],
   "exclude": ["node_modules/**/*", ".serverless/**/*", ".webpack/**/*", "_warmup/**/*", ".vscode/**/*"],
   "ts-node": {
-    "require": ["tsconfig-paths/register"]
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "module": "node16",
+      "moduleResolution": "node16"
+    }
   }
 }
